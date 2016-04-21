@@ -6,12 +6,15 @@ from time import sleep
 STORAGE_LENGTH = 15 # No of values in the mean
 TURNINESS = 150 # Sharpness of turn
 HOLD_SR_LEN = 20 # Length of shift register for holding
+CLOSENESS_THRESHOLD = 10 # (in cm) Distance before going "that's too close"
 
 ir = ev3.sensor('in1:i2c8') # It's an old sensor, so it needs i2c8
 gyro = ev3.gyro_sensor('in2')
 steer = [ev3.large_motor('outA'),ev3.large_motor('outB')]
 hold = ev3.large_motor('outD')
 kicker = ev3.motor('outC')
+# [ev3.ultrasonic("in4"),"in3"]
+ultra = [ev3.UltrasonicSensor('in4'),ev3.UltrasonicSensor('in3')]
 
 # a.run_to_rel_pos(position_sp=720,duty_cycle_sp=-100) is the command for doing certain length rotationy stuff
 
@@ -23,7 +26,8 @@ calibrateGyro = 0
 def updateGyro(dt):
 	# Update the gyro, given delta time
 	gyroValue += (gyro.value()*dt) - calibrateGyro
-	gyroValue = (abs(gyroValue) % 360) * (abs(gyroValue)/gyroValue)
+	gyroValue = ((gyroValue + 180) % 360) - 180
+	# gyroValue takes values of -180 to +180, as you'd expect.
 
 def mean(t):
 	return sum(t)/float(len(t))
@@ -42,7 +46,11 @@ def move(angle):
 	steer[0].run_forever(duty_cycle_sp=int(ls))
 	steer[1].run_forever(duty_cycle_sp=int(rs))
 
-def move(a): pass # uncomment this line for tabletop tests, to stop it moving
+def objectDetection():
+	# Return a [Bool, Bool] detailing which ultrasonics detect something as too close.
+	return [ultra[0].value() < CLOSENESS_THRESHOLD, ultra[1].value < CLOSENESS_THRESHOLD]
+
+# def move(a): pass # uncomment this line for tabletop tests, to stop it moving
 
 def exit_handler(): # This stops the motors, which is a good idea.
 	steer[0].stop()
@@ -68,15 +76,23 @@ if __name__ == '__main__':
 	oldTime = time.time()
 	while True:
 		updateGyro(time.time() - oldTime)
+		closeThings = objectDetection()
 		q = ir.value() # Angle from 1 - 9 units (very left to very right)
 		del(holding_sr[0])
 		holding_sr.append(hold.speed)
-		if sum(holding_sr)/HOLD_SR_LEN <= hold_threshold: # If the ball is in the dribbler (the dribbler motor is slower)
-			move(0) # This will be rewritten! It'll rotate the right way, go forward until something's close and then fire!
-			sleep(0.5)
-			hold.run_forever(duty_cycle_sp=-100)
-			sleep(0.5)
+		if sum(holding_sr)/HOLD_SR_LEN <= hold_threshold:
+			# WE HAVE THE BALL, SO:
+			if closeThings[0] and closeThings[1] and abs(gyroValue) < 5:
+				# We are in front of the goal, and want to score
+				# So let's just push the ball already
+				move(0)
+				hold.run_forever(duty_cycle_sp=-100)
+				sleep(0.5)
+			else:
+				# Move towards the goal
+
 		elif q != 0: # We see the ball!
+			# WE DON'T HAVE THE BALL, SO:
 			vals[c] = q
 			c+=1
 			if c>=STORAGE_LENGTH:
