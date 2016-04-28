@@ -15,7 +15,6 @@ steer = [LargeMotor('outA'),LargeMotor('outB')]
 hold = LargeMotor('outD')
 # [ev3.UltrasonicSensor("in4"),"in3"]
 ultra = [UltrasonicSensor('in4'),UltrasonicSensor('in3')]
-gyroValue = 0
 
 # a.run_to_rel_pos(position_sp=720,duty_cycle_sp=-100) is the command for doing certain length rotationy stuff
 
@@ -24,11 +23,12 @@ c = 0
 gyroValue = 0
 calibrateGyro = 0
 
-def updateGyro(dt):
+def updateGyro(dt,gyroValue):
 	# Update the gyro, given delta time
 	gyroValue += (gyro.value()*dt) - calibrateGyro
 	gyroValue = ((gyroValue + 180) % 360) - 180
 	# gyroValue takes values of -180 to +180, as you'd expect.
+	return gyroValue
 
 def mean(t):
 	return sum(t)/float(len(t))
@@ -80,7 +80,7 @@ if __name__ == '__main__':
 	calibrateGyro = sum(holding_sr)/20.0
 	oldTime = time.time()
 	while True:
-		updateGyro(time.time() - oldTime)
+		gyroValue = updateGyro(time.time() - oldTime, gyroValue)
 		closeThings = objectDetection()
 		q = ir.value() # Angle from 1 - 9 units (very left to very right)
 		del(holding_sr[0])
