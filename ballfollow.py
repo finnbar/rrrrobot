@@ -7,6 +7,7 @@ STORAGE_LENGTH = 15 # No of values in the mean
 TURNINESS = 150 # Sharpness of turn
 HOLD_SR_LEN = 20 # Length of shift register for holding
 CLOSENESS_THRESHOLD = 10 # (in cm) Distance before going "that's too close"
+SPINNING_SPEED = 50 # Speed that it spins at.
 
 ir = ev3.sensor('in1:i2c8') # It's an old sensor, so it needs i2c8
 gyro = ev3.gyro_sensor('in2')
@@ -45,6 +46,10 @@ def move(angle):
 		rs = 100
 	steer[0].run_forever(duty_cycle_sp=int(ls))
 	steer[1].run_forever(duty_cycle_sp=int(rs))
+
+def spin(direction):
+	steer[0].run_forever(duty_cycle_sp=SPINNING_SPEED*direction)
+	steer[1].run_forever(duty_cycle_sp=-SPINNING_SPEED*direction)
 
 def objectDetection():
 	# Return a [Bool, Bool] detailing which ultrasonics detect something as too close.
@@ -90,7 +95,10 @@ if __name__ == '__main__':
 				sleep(0.5)
 			else:
 				# Move towards the goal
-
+				if abs(gyroValue) < 45:
+					move(gyroValue/360.0)
+				else:
+					spin(gyroValue/abs(gyroValue))
 		elif q != 0: # We see the ball!
 			# WE DON'T HAVE THE BALL, SO:
 			vals[c] = q
