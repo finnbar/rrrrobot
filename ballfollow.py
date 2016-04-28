@@ -1,6 +1,6 @@
 #!/usr/bin/python2.7
 import atexit
-import ev3dev as ev3
+from ev3dev.auto import *
 from time import sleep
 
 STORAGE_LENGTH = 15 # No of values in the mean
@@ -9,13 +9,12 @@ HOLD_SR_LEN = 20 # Length of shift register for holding
 CLOSENESS_THRESHOLD = 10 # (in cm) Distance before going "that's too close"
 SPINNING_SPEED = 50 # Speed that it spins at.
 
-ir = ev3.sensor('in1:i2c8') # It's an old sensor, so it needs i2c8
-gyro = ev3.gyro_sensor('in2')
-steer = [ev3.large_motor('outA'),ev3.large_motor('outB')]
-hold = ev3.large_motor('outD')
-kicker = ev3.motor('outC')
-# [ev3.ultrasonic("in4"),"in3"]
-ultra = [ev3.UltrasonicSensor('in4'),ev3.UltrasonicSensor('in3')]
+ir = Sensor('in1:i2c8') # It's an old sensor, so it needs i2c8
+gyro = GyroSensor('in2')
+steer = [LargeMotor('outA'),LargeMotor('outB')]
+hold = LargeMotor('outD')
+# [ev3.UltrasonicSensor("in4"),"in3"]
+ultra = [UltrasonicSensor('in4'),UltrasonicSensor('in3')]
 
 # a.run_to_rel_pos(position_sp=720,duty_cycle_sp=-100) is the command for doing certain length rotationy stuff
 
