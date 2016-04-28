@@ -1,7 +1,7 @@
 #!/usr/bin/python2.7
 import atexit
 from ev3dev.auto import *
-from time import sleep
+import time
 
 STORAGE_LENGTH = 15 # No of values in the mean
 TURNINESS = 150 # Sharpness of turn
@@ -68,7 +68,7 @@ if __name__ == '__main__':
 	hold.run_forever(duty_cycle_sp=50) # This is our dribbler motor
 	hold_threshold = 0
 	gyro.mode = "GYRO-RATE"
-	sleep(1)
+	time.sleep(1)
 	for _ in range(20): # Check the dribbler speed to work out when the ball is in the way
 		holding_sr.append(hold.speed)
 	hold_threshold=sum(holding_sr)/21.0
@@ -91,7 +91,7 @@ if __name__ == '__main__':
 				# So let's just push the ball already
 				move(0)
 				hold.run_forever(duty_cycle_sp=-100)
-				sleep(0.5)
+				time.sleep(0.5)
 			else:
 				# Move towards the goal
 				if abs(gyroValue) < 45:
