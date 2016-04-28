@@ -15,6 +15,7 @@ steer = [LargeMotor('outA'),LargeMotor('outB')]
 hold = LargeMotor('outD')
 # [ev3.UltrasonicSensor("in4"),"in3"]
 ultra = [UltrasonicSensor('in4'),UltrasonicSensor('in3')]
+gyroValue = 0
 
 # a.run_to_rel_pos(position_sp=720,duty_cycle_sp=-100) is the command for doing certain length rotationy stuff
 
