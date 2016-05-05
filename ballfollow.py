@@ -81,6 +81,7 @@ if __name__ == '__main__':
 	oldTime = time.time()
 	while True:
 		gyroValue = updateGyro(time.time() - oldTime, gyroValue)
+		print gyroValue
 		closeThings = objectDetection()
 		q = ir.value() # Angle from 1 - 9 units (very left to very right)
 		del(holding_sr[0])
@@ -88,6 +89,7 @@ if __name__ == '__main__':
 		if sum(holding_sr)/HOLD_SR_LEN <= hold_threshold:
 			# WE HAVE THE BALL, SO:
 			if closeThings[0] and closeThings[1] and abs(gyroValue) < 5:
+				print "Scoring"
 				# We are in front of the goal, and want to score
 				# So let's just push the ball already
 				move(0)
@@ -96,10 +98,13 @@ if __name__ == '__main__':
 			else:
 				# Move towards the goal
 				if abs(gyroValue) < 45:
+					print "Facing right way ish"
 					move(gyroValue/360.0)
 				else:
+					print "Nowhere near."
 					spin(gyroValue/abs(gyroValue))
 		elif q != 0: # We see the ball!
+			print "Seeing ball"
 			# WE DON'T HAVE THE BALL, SO:
 			vals[c] = q
 			c+=1
@@ -110,6 +115,7 @@ if __name__ == '__main__':
 			move(angle)
 			hold.run_forever(duty_cycle_sp=50)
 		else: # Angle is 0, or failed to find ball
+			print "No idea."
 			if mean(vals) > 5: # If it was already going right,
 				move(1)    # Go right!
 			else:
