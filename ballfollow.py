@@ -21,14 +21,14 @@ ultra = [UltrasonicSensor('in4'),UltrasonicSensor('in3')]
 vals = [5 for i in range(STORAGE_LENGTH)]
 c = 0
 gyroValue = 0
-calibrateGyro = 0
 
-def updateGyro(dt,gyroValue):
-	# Update the gyro, given delta time
-	gyroValue += (gyro.value()*dt) - calibrateGyro
-	gyroValue = ((gyroValue + 180) % 360) - 180
+def getGyro():
 	# gyroValue takes values of -180 to +180, as you'd expect.
-	return gyroValue
+	return ((gyro.value() + 180) % 360) - 180
+	
+def resetGyro():
+	gyro.mode = "GYRO-RATE"
+	gyro.mode = "GYRO-ANG"
 
 def mean(t):
 	return sum(t)/float(len(t))
@@ -68,19 +68,14 @@ if __name__ == '__main__':
 	assert steer[0].connected and steer[1].connected and hold.connected # Basic assert, just in case
 	hold.run_forever(duty_cycle_sp=50) # This is our dribbler motor
 	hold_threshold = 0
-	gyro.mode = "GYRO-RATE"
+	gyro.mode = "GYRO-ANG"
 	time.sleep(1)
 	for _ in range(20): # Check the dribbler speed to work out when the ball is in the way
 		holding_sr.append(hold.speed)
 	hold_threshold=sum(holding_sr)/21.0
-	holding_sr = []
-	for _ in range(20):
-		holding_sr.append(gyro.value())
-	print hold_threshold
-	calibrateGyro = sum(holding_sr)/20.0
 	oldTime = time.time()
 	while True:
-		gyroValue = updateGyro(time.time() - oldTime, gyroValue)
+		gyroValue = getGyro()
 		print gyroValue
 		closeThings = objectDetection()
 		q = ir.value() # Angle from 1 - 9 units (very left to very right)
