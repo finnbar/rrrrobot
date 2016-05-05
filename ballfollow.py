@@ -4,7 +4,7 @@ from ev3dev.auto import *
 import time
 
 STORAGE_LENGTH = 15 # No of values in the mean
-TURNINESS = 200 # Sharpness of turn
+TURNINESS = 150 # Sharpness of turn
 HOLD_SR_LEN = 20 # Length of shift register for holding
 CLOSENESS_THRESHOLD = 10 # (in cm) Distance before going "that's too close"
 SPINNING_SPEED = 50 # Speed that it spins at.
@@ -21,6 +21,7 @@ ultra = [UltrasonicSensor('in4'),UltrasonicSensor('in3')]
 vals = [5 for i in range(STORAGE_LENGTH)]
 c = 0
 gyroValue = 0
+isCorrecting = True
 
 def getGyro():
 	# gyroValue takes values of -180 to +180, as you'd expect.
@@ -68,11 +69,11 @@ if __name__ == '__main__':
 	assert steer[0].connected and steer[1].connected and hold.connected # Basic assert, just in case
 	hold.run_forever(duty_cycle_sp=50) # This is our dribbler motor
 	hold_threshold = 0
-	gyro.mode = "GYRO-ANG"
+	resetGyro()
 	time.sleep(1)
-	for _ in range(20): # Check the dribbler speed to work out when the ball is in the way
+	for _ in range(HOLD_SR_LEN): # Check the dribbler speed to work out when the ball is in the way
 		holding_sr.append(hold.speed)
-	hold_threshold=sum(holding_sr)/21.0
+	hold_threshold=sum(holding_sr)/(HOLD_SR_LEN + 1.0)
 	oldTime = time.time()
 	while True:
 		gyroValue = getGyro()
@@ -92,13 +93,18 @@ if __name__ == '__main__':
 				time.sleep(0.5)
 			else:
 				# Move towards the goal
-				if abs(gyroValue) < 45:
-					print "Facing right way ish"
-					move(gyroValue/360.0)
+				if abs(gyroValue) > 45:
+					isCorrecting = True
+				if abs(gyroValue) < 5 or not isCorrecting:
+					print "Hammer time."
+					isCorrecting = False
+					#move(-gyroValue/360.0)
+					move(0)
 				else:
-					print "Nowhere near."
-					spin(gyroValue/abs(gyroValue))
+					print "Nowhere near to facing goal."
+					spin(-gyroValue/abs(gyroValue))
 		elif q != 0: # We see the ball!
+			isCorrecting = True
 			print "Seeing ball"
 			# WE DON'T HAVE THE BALL, SO:
 			vals[c] = q
@@ -110,7 +116,8 @@ if __name__ == '__main__':
 			move(angle)
 			hold.run_forever(duty_cycle_sp=50)
 		else: # Angle is 0, or failed to find ball
-			print "No idea."
+			isCorrecting = True
+			print "No idea where ball is."
 			if mean(vals) > 5: # If it was already going right,
 				move(1)    # Go right!
 			else:
