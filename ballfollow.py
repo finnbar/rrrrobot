@@ -4,7 +4,7 @@ from ev3dev.auto import *
 import time
 
 STORAGE_LENGTH = 15 # No of values in the mean
-TURNINESS = 150 # Sharpness of turn
+TURNINESS = 200 # Sharpness of turn
 HOLD_SR_LEN = 20 # Length of shift register for holding
 CLOSENESS_THRESHOLD = 10 # (in cm) Distance before going "that's too close"
 SPINNING_SPEED = 50 # Speed that it spins at.
