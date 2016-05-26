@@ -14,7 +14,7 @@ gyro = GyroSensor('in2')
 steer = [LargeMotor('outA'),LargeMotor('outB')]
 hold = LargeMotor('outD')
 # [ev3.UltrasonicSensor("in4"),"in3"]
-ultra = [UltrasonicSensor('in4'),UltrasonicSensor('in3')]
+ultra = UltrasonicSensor('in3')
 
 # a.run_to_rel_pos(position_sp=720,duty_cycle_sp=-100) is the command for doing certain length rotationy stuff
 
@@ -54,7 +54,7 @@ def spin(direction):
 
 def objectDetection():
 	# Return a [Bool, Bool] detailing which ultrasonics detect something as too close.
-	return [ultra[0].value() < CLOSENESS_THRESHOLD, ultra[1].value < CLOSENESS_THRESHOLD]
+	return [ultra.value() < CLOSENESS_THRESHOLD, ultra.value < CLOSENESS_THRESHOLD]
 
 # def move(a): pass # uncomment this line for tabletop tests, to stop it moving
 
