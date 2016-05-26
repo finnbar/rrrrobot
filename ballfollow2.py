@@ -79,7 +79,9 @@ def moveToGoal(ro):
 		move(0)
 		if abs(getGyro()) > 45:
 			return "realign", ro
-		if ultra.value() < CLOSENESS_THRESHOLD:
+		ul = ultra.value()
+		print ul
+		if ul < CLOSENESS_THRESHOLD:
 			return "shoot", ro
 
 def retreat(ro):
