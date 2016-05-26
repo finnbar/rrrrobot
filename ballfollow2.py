@@ -106,7 +106,7 @@ def lookForBall(ro):
 			ro[holdPointer] = 0
 		irValue = ir.value()
 		if irValue != 0:
-			ro[irValues][ro.irPointer] = irValue
+			ro[irValues][ro[irPointer]] = irValue
 			ro[irPointer] += 1
 			if ro[irPointer] >= STORAGE_LENGTH:
 				ro[irPointer] = 0
