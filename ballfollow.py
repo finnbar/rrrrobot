@@ -54,7 +54,7 @@ def spin(direction):
 
 def objectDetection():
 	# Return a [Bool, Bool] detailing which ultrasonics detect something as too close.
-	return [ultra.value() < CLOSENESS_THRESHOLD, ultra.value < CLOSENESS_THRESHOLD]
+	return [ultra.value() < CLOSENESS_THRESHOLD, ultra.value() < CLOSENESS_THRESHOLD]
 
 # def move(a): pass # uncomment this line for tabletop tests, to stop it moving
 
