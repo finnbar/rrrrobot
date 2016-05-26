@@ -145,4 +145,5 @@ if __name__ == '__main__':
 	oldTime = time.time()
 	robotObject[holdThreshold] = hThreshold
 	while True:
+		print state
 		state,robotObject = functions[state](robotObject)
