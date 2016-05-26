@@ -140,7 +140,7 @@ def reset(ro):
 
 if __name__ == '__main__':
 	functions = {"moveToGoal": moveToGoal, "retreat": retreat, "shoot": shoot, "lookForBall": lookForBall, "realign": realign}
-	robotObject = {irValues: [5] * STORAGE_LENGTH, irPointer: 0, holdThreshold: 0, holdValues: [0] * HOLD_SR_LEN, holdPointer: 0} # List of helpful things that are helpful.
+	robotObject = {irValues: [5] * STORAGE_LENGTH, irPointer: 0, holdThreshold: 0, holdValues: [1000] * HOLD_SR_LEN, holdPointer: 0} # List of helpful things that are helpful.
 	state = "lookForBall"
 	print "GO!"
 	holdingSr=[] # This is our general shift register, I'll explain later.
@@ -151,8 +151,7 @@ if __name__ == '__main__':
 	time.sleep(1)
 	for _ in range(HOLD_SR_LEN): # Check the dribbler speed to work out when the ball is in the way
 		holdingSr.append(hold.speed)
-	hThreshold=sum(holdingSr)/(HOLD_SR_LEN + 1.0)
-	oldTime = time.time()
+	hThreshold = sum(holdingSr)/(HOLD_SR_LEN + 1.0)
 	robotObject[holdThreshold] = hThreshold
 	while True:
 		print state
