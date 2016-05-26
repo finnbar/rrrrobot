@@ -20,9 +20,6 @@ HOLD_SR_LEN = 20 # Length of shift register for holding
 CLOSENESS_THRESHOLD = 10 # (in cm) Distance before going "that's too close"
 SPINNING_SPEED = 50 # Speed that it spins at.
 
-functions = {"moveGoal": moveToGoal, "retreat": retreat, "shoot": shoot, "lookForBall": lookForBall, "realign": realign}
-robotObject = {irValues: [5] * STORAGE_LENGTH, irPointer: 0, holdThreshold: 0, holdValues: [0] * HOLD_SR_LEN, holdPointer: 0} # List of helpful things that are helpful.
-
 '''
 Useful Functions
 '''
@@ -131,6 +128,8 @@ def reset(ro):
 	return "lookForBall", ro
 
 if __name__ == '__main__':
+	functions = {"moveGoal": moveToGoal, "retreat": retreat, "shoot": shoot, "lookForBall": lookForBall, "realign": realign}
+	robotObject = {irValues: [5] * STORAGE_LENGTH, irPointer: 0, holdThreshold: 0, holdValues: [0] * HOLD_SR_LEN, holdPointer: 0} # List of helpful things that are helpful.
 	state = "lookForBall"
 	print "GO!"
 	holdingSr=[] # This is our general shift register, I'll explain later.
