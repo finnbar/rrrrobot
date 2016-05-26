@@ -117,7 +117,7 @@ def lookForBall(ro):
 			return "realign", ro
 
 def realign(ro):
-	# If angle is far off corrects the orientation of the robot. On getting to <5d, switch to moveToGoal.
+	# If angle is far off, rotate until not the case.
 	while True:
 		gyroValue = getGyro()
 		if abs(gyroValue) < 5:
