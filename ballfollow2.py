@@ -77,7 +77,7 @@ def moveToGoal(ro):
 	# Move forwards in a straight line, but if you're >45d out, spin back (realign). Check throughout whether retreat should be called.
 	while True:
 		move(0)
-		if abs(getGyro) > 45:
+		if abs(getGyro()) > 45:
 			return "realign", ro
 
 def retreat(ro):
