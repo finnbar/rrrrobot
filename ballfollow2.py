@@ -10,6 +10,17 @@ hold = LargeMotor('outD')
 ultra = UltrasonicSensor('in3')
 
 '''
+Cheating Constants
+Because I'm done with editing stuff
+'''
+
+irValues = 3
+irPointer = 4
+holdPointer = 5
+holdThreshold = 6
+holdValues = 7
+
+'''
 Cool Things we Could Add:
 > Bluetooth - "I've got the ball, don't go for it." (Seb Towers 2016)
 '''
