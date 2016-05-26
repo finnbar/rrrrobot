@@ -102,6 +102,7 @@ def lookForBall(ro):
 	# NOTE: ADD OBJECT DETECTION
 	while True:
 		ro[holdValues][ro[holdPointer]] = hold.speed
+		ro[holdPointer] += 1
 		if ro[holdPointer] >= HOLD_SR_LEN:
 			ro[holdPointer] = 0
 		irValue = ir.value()
