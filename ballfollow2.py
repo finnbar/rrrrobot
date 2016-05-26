@@ -139,7 +139,7 @@ def reset(ro):
 	return "lookForBall", ro
 
 if __name__ == '__main__':
-	functions = {"moveGoal": moveToGoal, "retreat": retreat, "shoot": shoot, "lookForBall": lookForBall, "realign": realign}
+	functions = {"moveToGoal": moveToGoal, "retreat": retreat, "shoot": shoot, "lookForBall": lookForBall, "realign": realign}
 	robotObject = {irValues: [5] * STORAGE_LENGTH, irPointer: 0, holdThreshold: 0, holdValues: [0] * HOLD_SR_LEN, holdPointer: 0} # List of helpful things that are helpful.
 	state = "lookForBall"
 	print "GO!"
