@@ -28,7 +28,7 @@ Cool Things we Could Add:
 STORAGE_LENGTH = 15 # No of values in the mean
 TURNINESS = 150 # Sharpness of turn
 HOLD_SR_LEN = 20 # Length of shift register for holding
-CLOSENESS_THRESHOLD = 10 # (in cm) Distance before going "that's too close"
+CLOSENESS_THRESHOLD = 100 # (in mm) Distance before going "that's too close"
 SPINNING_SPEED = 50 # Speed that it spins at.
 
 '''
@@ -66,6 +66,16 @@ def resetGyro():
 	gyro.mode = "GYRO-RATE"
 	gyro.mode = "GYRO-ANG"
 
+def hasBall(ro):
+	ro[holdValues][ro[holdPointer]] = hold.speed
+	ro[holdPointer] += 1
+	if ro[holdPointer] >= HOLD_SR_LEN:
+		ro[holdPointer] = 0
+	if mean(ro[holdValues]) <= ro[holdThreshold]:
+		return ro, True
+	else:
+		return ro, False
+
 def collision(ro):
 	pass
 
@@ -73,14 +83,18 @@ def collision(ro):
 States
 '''
 
+# In all states with ball, implement check to see if ball lost and go back to looking if so.
+
 def moveToGoal(ro):
 	# Move forwards in a straight line, but if you're >45d out, spin back (realign). Check throughout whether retreat should be called.
 	while True:
 		move(0)
+		ro, gotBall = hasBall(ro)
+		if not gotBall:
+			return "lookForBall", ro
 		if abs(getGyro()) > 45:
 			return "realign", ro
 		ul = ultra.value()
-		print ul
 		if ul < CLOSENESS_THRESHOLD:
 			return "shoot", ro
 
@@ -105,10 +119,7 @@ def lookForBall(ro):
 	# If ball's in sight, go get it, else spin. On finding it, realign.
 	# NOTE: ADD OBJECT DETECTION
 	while True:
-		ro[holdValues][ro[holdPointer]] = hold.speed
-		ro[holdPointer] += 1
-		if ro[holdPointer] >= HOLD_SR_LEN:
-			ro[holdPointer] = 0
+		ro, gotBall = hasBall(ro)
 		irValue = ir.value()
 		if irValue != 0:
 			ro[irValues][ro[irPointer]] = irValue
@@ -125,14 +136,16 @@ def lookForBall(ro):
 				move(-1)
 			hold.run_forever(duty_cycle_sp=50)
 		# Check if it's found:
-		if mean(ro[holdValues]) <= ro[holdThreshold]:
-			# We've got the ball
+		if gotBall:
 			return "realign", ro
 
 def realign(ro):
 	# If angle is far off, rotate until not the case.
 	while True:
 		gyroValue = getGyro()
+		ro, gotBall = hasBall(ro)
+		if not gotBall:
+			return "lookForBall", ro
 		if abs(gyroValue) < 5:
 			return "moveToGoal", ro
 		else:
