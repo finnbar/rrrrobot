@@ -120,7 +120,7 @@ def lookForBall(ro):
 				move(-1)
 			hold.run_forever(duty_cycle_sp=50)
 		# Check if it's found:
-		if mean(ro[oldValues]) <= ro[holdThreshold]:
+		if mean(ro[holdValues]) <= ro[holdThreshold]:
 			# We've got the ball
 			return "realign", ro
 
