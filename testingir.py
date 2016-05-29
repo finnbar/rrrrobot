@@ -32,4 +32,4 @@ def averagingDirection():
 		for i in range(5):
 			if channels[largest][pointer] < channels[i][pointer]:
 				largest = i
-		print "Direction": [1,3,5,7,9][i]
+		print "Direction: " + str([1,3,5,7,9][i])
