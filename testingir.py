@@ -19,7 +19,7 @@ def getMode():
 def averagingDirection():
 	registerLength = 20
 	ir.mode = 'AC-ALL'
-	channels = [0 for i in range(5)] * registerLength
+	channels = [[0 for i in range(5)] for j in range(registerLength)]
 	pointer = 0
 	while True:
 		for i in range(5):
