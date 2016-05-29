@@ -32,7 +32,7 @@ def averagingDirection():
 		print averaged
 		m = max(averaged)
 		for i in range(5):
-			if m == averaged[i]
+			if averaged[i] == m:
 				print "Direction: " + str([1,3,5,7,9][i])
 		pointer += 1
 		if pointer >= registerLength:
