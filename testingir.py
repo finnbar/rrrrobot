@@ -23,13 +23,13 @@ def averagingDirection():
 	pointer = 0
 	while True:
 		for i in range(5):
-			channels[i][pointer] = ir.value(i+1)
-		print [channels[i][pointer] for i in range(5)]
+			channels[pointer][i] = ir.value(i+1)
+		print channels[pointer]
+		largest = 0
+		for i in range(5):
+			if channels[pointer][largest] < channels[pointer][i]:
+				largest = i
+		print "Direction: " + str([1,3,5,7,9][i])
 		pointer += 1
 		if pointer >= registerLength:
 			pointer = 0
-		largest = 0
-		for i in range(5):
-			if channels[largest][pointer] < channels[i][pointer]:
-				largest = i
-		print "Direction: " + str([1,3,5,7,9][i])
