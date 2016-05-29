@@ -2,6 +2,9 @@ from ev3dev.auto import *
 
 ir = Sensor("in1:i2c8")
 
+def mean(t):
+	return float(sum(t))/len(t)
+
 def r():
 	if ir.mode == 'DC' or ir.mode == 'AC':
 		return "Direction: {}".format(ir.value())
@@ -26,8 +29,9 @@ def averagingDirection():
 			channels[pointer][i] = ir.value(i+1)
 		print channels[pointer]
 		largest = 0
+		averaged = [mean([channels[i][j] for i in range(registerLength)]) for j in range(5)]
 		for i in range(5):
-			if channels[pointer][largest] < channels[pointer][i]:
+			if averaged[largest] < averaged[i]:
 				largest = i
 		print "Direction: " + str([1,3,5,7,9][i])
 		pointer += 1
