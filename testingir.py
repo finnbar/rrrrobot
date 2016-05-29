@@ -15,3 +15,21 @@ def setMode(m):
 
 def getMode():
 	return ir.mode
+
+def averagingDirection():
+	registerLength = 20
+	ir.mode = 'AC-ALL'
+	channels = [[0] for i in range(5)] * registerLength
+	pointer = 0
+	while True:
+		for i in range(5):
+			channels[i][pointer] = ir.value(i+1)
+		print [channels[i][pointer] for i in range(5)]
+		pointer += 1
+		if pointer >= registerLength:
+			pointer = 0
+		largest = 0
+		for i in range(5):
+			if channels[largest][pointer] < channels[i][pointer]:
+				largest = i
+		print "Direction": [1,3,5,7,9][i]
