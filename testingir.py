@@ -30,10 +30,10 @@ def averagingDirection():
 		largest = 0
 		averaged = [mean([channels[i][j] for i in range(registerLength)]) for j in range(5)]
 		print averaged
+		m = max(averaged)
 		for i in range(5):
-			if averaged[largest] < averaged[i]:
-				largest = i
-		print "Direction: " + str([1,3,5,7,9][i])
+			if m == averaged[i]
+				print "Direction: " + str([1,3,5,7,9][i])
 		pointer += 1
 		if pointer >= registerLength:
 			pointer = 0
