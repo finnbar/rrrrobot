@@ -27,9 +27,9 @@ def averagingDirection():
 	while True:
 		for i in range(5):
 			channels[pointer][i] = ir.value(i+1)
-		print channels[pointer]
 		largest = 0
 		averaged = [mean([channels[i][j] for i in range(registerLength)]) for j in range(5)]
+		print averaged
 		for i in range(5):
 			if averaged[largest] < averaged[i]:
 				largest = i
