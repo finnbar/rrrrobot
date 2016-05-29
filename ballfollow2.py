@@ -7,10 +7,7 @@ WHY IS INFRARED BEING LIKE THIS??? Check this, possibly rebuild grabber (not spi
 
 IDEA: Okay, run ir.driver_name, and refer to that documentation. Or if all goes south, pull out the dark magic. Seriously, there's some crazy stuff for directly reading the sensor's registers. (See http://www.ev3dev.org/docs/sensors/using-i2c-sensors/, the bit about addressing and the sensor's manual/datasheet).
 
-IDEA2: It's probably this one: http://www.ev3dev.org/docs/sensors/hitechnic-nxt-irseeker-v2/
-So we can get multiple values. Probably with .value(N) for N in 0-6, or if .value gives a table.
-
-CHECK WHETHER BALL SIGNAL IS MODULATED OR NOT, IF SO CHANGE MODE!!!
+Notes: Use it in AC-ALL mode. When values hit > 110, discount sensor and charge forwards until no longer the case.
 '''
 
 ir = Sensor('in1:i2c8') # It's an old sensor, so it needs i2c8
@@ -18,17 +15,6 @@ gyro = GyroSensor('in2')
 steer = [LargeMotor('outA'),LargeMotor('outB')]
 hold = LargeMotor('outD')
 ultra = UltrasonicSensor('in3')
-
-'''
-Cheating Constants
-Because I'm done with editing stuff
-'''
-
-irValues = 3
-irPointer = 4
-holdPointer = 5
-holdThreshold = 6
-holdValues = 7
 
 '''
 Cool Things we Could Add:
@@ -80,11 +66,11 @@ def resetGyro():
 	gyro.mode = "GYRO-ANG"
 
 def hasBall(ro):
-	ro[holdValues][ro[holdPointer]] = hold.speed
-	ro[holdPointer] += 1
-	if ro[holdPointer] >= HOLD_SR_LEN:
-		ro[holdPointer] = 0
-	if mean(ro[holdValues]) <= ro[holdThreshold]:
+	ro.holdValues[ro.holdPointer] = hold.speed
+	ro.holdPointer += 1
+	if ro.holdPointer >= HOLD_SR_LEN:
+		ro.holdPointer = 0
+	if mean(ro.holdValues) <= ro.holdThreshold:
 		return ro, True
 	else:
 		return ro, False
@@ -133,15 +119,15 @@ def lookForBall(ro):
 		ro, gotBall = hasBall(ro)
 		irValue = ir.value()
 		if irValue != 0:
-			ro[irValues][ro[irPointer]] = irValue
-			ro[irPointer] += 1
-			if ro[irPointer] >= STORAGE_LENGTH:
-				ro[irPointer] = 0
+			ro.irValues[ro.irPointer] = irValue
+			ro.irPointer += 1
+			if ro.irPointer >= STORAGE_LENGTH:
+				ro.irPointer = 0
 			angle = (irValue-5)*0.25
 			move(angle)
 			hold.run_forever(duty_cycle_sp=50)
 		else:
-			if mean(ro[irValues]) > 5:
+			if mean(ro.irValues) > 5:
 				move(1)
 			else:
 				move(-1)
@@ -167,9 +153,17 @@ def reset(ro):
 	resetGyro()
 	return "lookForBall", ro
 
+class RobotObject():
+	def __init__(self):
+		self.irValues = [5] * STORAGE_LENGTH
+		self.irPointer = 0
+		self.holdThreshold = 0
+		self.holdValues = [1000] * HOLD_SR_LEN
+		self.holdPointer = 0
+
 if __name__ == '__main__':
 	functions = {"moveToGoal": moveToGoal, "retreat": retreat, "shoot": shoot, "lookForBall": lookForBall, "realign": realign}
-	robotObject = {irValues: [5] * STORAGE_LENGTH, irPointer: 0, holdThreshold: 0, holdValues: [1000] * HOLD_SR_LEN, holdPointer: 0} # List of helpful things that are helpful.
+	ro = RobotObject()
 	state = "lookForBall"
 	print "GO!"
 	holdingSr=[] # This is our general shift register, I'll explain later.
@@ -181,7 +175,7 @@ if __name__ == '__main__':
 	for _ in range(HOLD_SR_LEN): # Check the dribbler speed to work out when the ball is in the way
 		holdingSr.append(hold.speed)
 	hThreshold = sum(holdingSr)/(HOLD_SR_LEN + 1.0)
-	robotObject[holdThreshold] = hThreshold
+	ro.holdThreshold = hThreshold
 	while True:
 		print state
-		state,robotObject = functions[state](robotObject)
+		state,ro = functions[state](ro)
