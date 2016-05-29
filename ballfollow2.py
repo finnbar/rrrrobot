@@ -1,7 +1,17 @@
 #!/usr/bin/python2.7
-import atexit
 from ev3dev.auto import *
 import time
+
+'''
+WHY IS INFRARED BEING LIKE THIS??? Check this, possibly rebuild grabber (not spinner). It detects 7 everwhere within a few centimetres of the sensor, thus causing it to turn sharply and have a hard time catching the ball on ONE SIDE (on the other side, this actually helps it to turn in). Also, we should give a delay to spinning (that is, wait for a few zeroes before spinning).
+
+IDEA: Okay, run ir.driver_name, and refer to that documentation. Or if all goes south, pull out the dark magic. Seriously, there's some crazy stuff for directly reading the sensor's registers. (See http://www.ev3dev.org/docs/sensors/using-i2c-sensors/, the bit about addressing and the sensor's manual/datasheet).
+
+IDEA2: It's probably this one: http://www.ev3dev.org/docs/sensors/hitechnic-nxt-irseeker-v2/
+So we can get multiple values. Probably with .value(N) for N in 0-6, or if .value gives a table.
+
+CHECK WHETHER BALL SIGNAL IS MODULATED OR NOT, IF SO CHANGE MODE!!!
+'''
 
 ir = Sensor('in1:i2c8') # It's an old sensor, so it needs i2c8
 gyro = GyroSensor('in2')
@@ -57,6 +67,9 @@ def spin(direction):
 	steer[0].run_forever(duty_cycle_sp=SPINNING_SPEED*direction)
 	steer[1].run_forever(duty_cycle_sp=-SPINNING_SPEED*direction)
 
+def stop():
+	steer[0].stop()
+	steer[1].stop()
 
 def getGyro():
 	# gyroValue takes values of -180 to +180, as you'd expect.
@@ -82,8 +95,6 @@ def collision(ro):
 '''
 States
 '''
-
-# In all states with ball, implement check to see if ball lost and go back to looking if so.
 
 def moveToGoal(ro):
 	# Move forwards in a straight line, but if you're >45d out, spin back (realign). Check throughout whether retreat should be called.
