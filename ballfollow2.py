@@ -60,7 +60,7 @@ def stop():
 def getGyro():
 	# gyroValue takes values of -180 to +180, as you'd expect.
 	return ((gyro.value() + 180) % 360) - 180
-	
+
 def resetGyro():
 	gyro.mode = "GYRO-RATE"
 	gyro.mode = "GYRO-ANG"

@@ -1,3 +1,5 @@
+# This file is for testing the Infrared Sensor, because it's a right nuisance.
+
 from ev3dev.auto import *
 
 ir = Sensor("in1:i2c8")
