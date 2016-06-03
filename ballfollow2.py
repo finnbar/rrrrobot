@@ -12,8 +12,8 @@ IDEA: Okay, run ir.driver_name, and refer to that documentation. Or if all goes 
 Notes: Use it in AC-ALL mode. When values hit > 110, discount sensor and charge forwards until no longer the case.
 
 TODO:
-> Write getIR(), which returns the direction it thinks it's going to UNLESS max(irValues) > 110, then just go forwards. BETTER IDEA: GET A BETTER IR SENSOR
-> Import the colour sensor, get it to fire retreat() when it gets white, if it's got the ball, or spin if you don't have the ball and that's the case.
+> Write getIR(), which returns the direction it thinks it's going to UNLESS max(irValues) > 110, then just go forwards. BETTER IDEA: GET A BETTER IR SENSOR.
+> Import the colour sensor, get it to fire retreat() when it gets white, if it's got the ball, or spin if you don't have the ball and that's the case. THIS KIND OF WORKS!
 > Collisions.
 '''
 
@@ -149,6 +149,7 @@ def lookForBall(ro):
 			angle = (irValue-5)*0.25
 			move(angle)
 		elif isWhite():
+			print "Saw line."
 			# Back away a bit, then spin.
 			move(0,-1)
 			time.sleep(0.75)
