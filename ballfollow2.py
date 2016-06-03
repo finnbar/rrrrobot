@@ -74,10 +74,10 @@ def resetGyro():
 	gyro.mode = "GYRO-ANG"
 
 def getIR():
-  return ir.value(0)
+	return ir.value(0)
 
 def isWhite():
-  return sum([co.value(i) for i in range(3)]) > WHITENESS_THRESHOLD
+	return sum([co.value(i) for i in range(3)]) > WHITENESS_THRESHOLD
 
 def hasBall(ro):
 	ro.holdValues[ro.holdPointer] = hold.speed
@@ -108,8 +108,8 @@ def moveToGoal(ro):
 		ul = ultra.value()
 		if ul < CLOSENESS_THRESHOLD:
 			return "shoot", ro
-    if isWhite():
-      return "retreat", ro
+		if isWhite():
+			return "retreat", ro
 
 def retreat(ro):
 	# We hit "the wall", reverse slightly, turn 90d, move forwards a bit (this is blocking). Then go to realign.
@@ -146,7 +146,7 @@ def lookForBall(ro):
 				move(1)
 			else:
 				move(-1)
-    hold.run_forever(duty_cycle_sp=50)
+		hold.run_forever(duty_cycle_sp=50)
 		# Check if it's found:
 		if gotBall:
 			return "realign", ro
@@ -179,8 +179,8 @@ class RobotObject():
 if __name__ == '__main__':
 	functions = {"moveToGoal": moveToGoal, "retreat": retreat, "shoot": shoot, "lookForBall": lookForBall, "realign": realign}
 	ro = RobotObject()
-  ir.mode = "AC-ALL"
-  co.mode = "RGB-RAW"
+	ir.mode = "AC-ALL"
+	co.mode = "RGB-RAW"
 	state = "lookForBall"
 	print "GO!"
 	holdingSr=[] # This is our general shift register, I'll explain later.
