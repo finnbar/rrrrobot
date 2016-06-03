@@ -141,6 +141,11 @@ def lookForBall(ro):
 				ro.irPointer = 0
 			angle = (irValue-5)*0.25
 			move(angle)
+		elif isWhite():
+			# Back away a bit, then spin.
+			move(0,-1)
+			time.sleep(0.25)
+			spin(1)
 		else:
 			if mean(ro.irValues) > 5:
 				move(1)
