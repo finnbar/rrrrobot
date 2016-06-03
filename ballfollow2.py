@@ -74,7 +74,11 @@ def resetGyro():
 	gyro.mode = "GYRO-ANG"
 
 def getIR():
-	return ir.value(0)
+	v = ir.value(0)
+	if v == 7:
+		return 6
+	else:
+		return v
 
 def isWhite():
 	return sum([co.value(i) for i in range(3)]) > WHITENESS_THRESHOLD
@@ -118,7 +122,7 @@ def retreat(ro):
 	while abs(getGyro()) < 90:
 		spin(1)
 	move(1)
-	for i in range(10):
+	for i in range(20):
 		time.sleep(0.075)
 		if isWhite():
 			return "retreat", ro
