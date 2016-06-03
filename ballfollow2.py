@@ -3,11 +3,18 @@ from ev3dev.auto import *
 import time
 
 '''
+come-to-robotics
+
 WHY IS INFRARED BEING LIKE THIS??? Check this, possibly rebuild grabber (not spinner). It detects 7 everwhere within a few centimetres of the sensor, thus causing it to turn sharply and have a hard time catching the ball on ONE SIDE (on the other side, this actually helps it to turn in). Also, we should give a delay to spinning (that is, wait for a few zeroes before spinning).
 
 IDEA: Okay, run ir.driver_name, and refer to that documentation. Or if all goes south, pull out the dark magic. Seriously, there's some crazy stuff for directly reading the sensor's registers. (See http://www.ev3dev.org/docs/sensors/using-i2c-sensors/, the bit about addressing and the sensor's manual/datasheet).
 
 Notes: Use it in AC-ALL mode. When values hit > 110, discount sensor and charge forwards until no longer the case.
+
+TODO:
+> Write getIR(), which returns the direction it thinks it's going to UNLESS max(irValues) > 110, then just go forwards. BETTER IDEA: GET A BETTER IR SENSOR
+> Import the colour sensor, get it to fire retreat() when it gets white, if it's got the ball, or spin if you don't have the ball and that's the case.
+> Collisions.
 '''
 
 ir = Sensor('in1:i2c8') # It's an old sensor, so it needs i2c8
@@ -15,6 +22,7 @@ gyro = GyroSensor('in2')
 steer = [LargeMotor('outA'),LargeMotor('outB')]
 hold = LargeMotor('outD')
 ultra = UltrasonicSensor('in3')
+co = ColorSensor('in4')
 
 '''
 Cool Things we Could Add:
@@ -26,6 +34,7 @@ TURNINESS = 150 # Sharpness of turn
 HOLD_SR_LEN = 20 # Length of shift register for holding
 CLOSENESS_THRESHOLD = 100 # (in mm) Distance before going "that's too close"
 SPINNING_SPEED = 50 # Speed that it spins at.
+WHITENESS_THRESHOLD = 750
 
 '''
 Useful Functions
@@ -48,7 +57,6 @@ def move(angle, direction=1):
 	steer[0].run_forever(duty_cycle_sp=int(ls)*direction)
 	steer[1].run_forever(duty_cycle_sp=int(rs)*direction)
 
-
 def spin(direction):
 	steer[0].run_forever(duty_cycle_sp=SPINNING_SPEED*direction)
 	steer[1].run_forever(duty_cycle_sp=-SPINNING_SPEED*direction)
@@ -64,6 +72,12 @@ def getGyro():
 def resetGyro():
 	gyro.mode = "GYRO-RATE"
 	gyro.mode = "GYRO-ANG"
+
+def getIR():
+  return ir.value(0)
+
+def isWhite():
+  return sum([co.value(i) for i in range(3)]) > WHITENESS_THRESHOLD
 
 def hasBall(ro):
 	ro.holdValues[ro.holdPointer] = hold.speed
@@ -94,6 +108,8 @@ def moveToGoal(ro):
 		ul = ultra.value()
 		if ul < CLOSENESS_THRESHOLD:
 			return "shoot", ro
+    if isWhite():
+      return "retreat", ro
 
 def retreat(ro):
 	# We hit "the wall", reverse slightly, turn 90d, move forwards a bit (this is blocking). Then go to realign.
@@ -117,21 +133,20 @@ def lookForBall(ro):
 	# NOTE: ADD OBJECT DETECTION
 	while True:
 		ro, gotBall = hasBall(ro)
-		irValue = ir.value()
-		if irValue != 0:
+		irValue = getIR()
+		if irValue != 0 and not isWhite():
 			ro.irValues[ro.irPointer] = irValue
 			ro.irPointer += 1
 			if ro.irPointer >= STORAGE_LENGTH:
 				ro.irPointer = 0
 			angle = (irValue-5)*0.25
 			move(angle)
-			hold.run_forever(duty_cycle_sp=50)
 		else:
 			if mean(ro.irValues) > 5:
 				move(1)
 			else:
 				move(-1)
-			hold.run_forever(duty_cycle_sp=50)
+    hold.run_forever(duty_cycle_sp=50)
 		# Check if it's found:
 		if gotBall:
 			return "realign", ro
@@ -164,6 +179,8 @@ class RobotObject():
 if __name__ == '__main__':
 	functions = {"moveToGoal": moveToGoal, "retreat": retreat, "shoot": shoot, "lookForBall": lookForBall, "realign": realign}
 	ro = RobotObject()
+  ir.mode = "AC-ALL"
+  co.mode = "RGB-RAW"
 	state = "lookForBall"
 	print "GO!"
 	holdingSr=[] # This is our general shift register, I'll explain later.
