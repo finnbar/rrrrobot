@@ -114,11 +114,14 @@ def moveToGoal(ro):
 def retreat(ro):
 	# We hit "the wall", reverse slightly, turn 90d, move forwards a bit (this is blocking). Then go to realign.
 	move(0,-1)
-	time.sleep(0.2)
+	time.sleep(0.5)
 	while abs(getGyro()) < 90:
 		spin(1)
 	move(1)
-	time.sleep(0.2)
+	for i in range(10):
+		time.sleep(0.075)
+		if isWhite():
+			return "retreat", ro
 	return "realign", ro
 
 def shoot(ro):
