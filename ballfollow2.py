@@ -146,6 +146,7 @@ def lookForBall(ro):
 			move(0,-1)
 			time.sleep(0.25)
 			spin(1)
+			time.sleep(0.25)
 		else:
 			if mean(ro.irValues) > 5:
 				move(1)
